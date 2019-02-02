@@ -2,14 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <title>My Favorite Quotes</title>
 </head>
 <body>
-    <header><h1>A Curated List of My Favorite Quotes</h1></header>
+    <header class="jumbotron">
+        <h1 class="display-4">A Curated List of My Favorite Quotes</h1>
+    </header>
     <main>
+        <form>
+            <input id="newquote" type="text" placeholder="It was the best of times...">
+            <input id="author" type="text" placeholder="Chuck Dickens">
+            <button id="addquote" type="button">Add Quote</button>
+        </form>
         <ul id="quotes">
             <li>All the world is a stage, and the people merely players --Will</li>
         </ul>
@@ -22,9 +32,31 @@
             $.getJSON('/quotes/all', function(data){
                 console.log(data);
                 $.each(data, function(key,val){
-                quotes.append(`<li> ${val.quote} -- ${val.author} </li>`);
+                quotes.append(`<li class="list-group-item"> ${val.quote} -- ${val.author} </li>`);
                 });
             });
+        }
+
+        function addQuote() {
+            var quote = $("#newquote").val();
+            var auth = $("#author").val();
+
+            if(quote.trim() && auth.trim()) {
+                $.ajax({
+                    type: "POST",
+                    url: "/quotes/add",
+                    data: JSON.stringify({author: auth, quote: quote }),
+                    contentType: "application/json; charset=utf-8",
+                    success: function(data){
+                        $("#quote").val();
+                        $("#author").val();
+                        console.log(data);
+                    },
+                    failure: function(errMsg){
+                        console.log(errMsg);
+                    }
+                });
+            }
         }
         $(document).ready(function() {
             listQuotes();
